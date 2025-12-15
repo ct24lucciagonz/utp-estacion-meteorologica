@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>ESTACIÓN METEOROLÓGICA</title>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+    }
+
+    .panel {
+      background: linear-gradient(145deg, #3f2b96, #1e1e2f);
+      width: 460px;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.3);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 26px;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+    }
+
+    .dato {
+      font-size: 18px;
+      margin: 10px 0;
+    }
+
+    .valor {
+      font-size: 38px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .estado {
+      margin: 15px 0;
+    }
+
+    .boton {
+      width: 130px;
+      height: 45px;
+      border-radius: 25px;
+      margin: auto;
+      line-height: 45px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      color: white;
+    }
+
+    .verde {
+      background: #00ff88;
+      box-shadow: 0 0 15px #00ff88;
+      color: #003322;
+    }
+
+    .rojo {
+      background: #ff004c;
+      box-shadow: 0 0 15px #ff004c;
+    }
+
+    canvas {
+      margin-top: 20px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+    }
+
+    footer {
+      margin-top: 20px;
+      font-size: 12px;
+      opacity: 0.7;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="panel">
+    <h1>ESTACIÓN METEOROLÓGICA</h1>
+
+    <div class="dato">TEMPERATURA</div>
+    <div class="valor" id="temp">-- °C</div>
+
+    <div class="dato">HUMEDAD</div>
+    <div class="valor" id="hum">-- %</div>
+
+    <div class="estado">
+      <div id="estadoBtn" class="boton">---</div>
+    </div>
+
+    <!-- GRAFICAS -->
+    <canvas id="grafTemp" width="400" height="160"></canvas>
+    <canvas id="grafHum" width="400" height="160"></canvas>
+
+    <footer>
+      © DANIEL RÍOS - UTP AZUERO
+    </footer>
+  </div>
+
+  <script>
+    let etiquetas = [];
+    let datosTemp = [];
+    let datosHum = [];
+    let contador = 0;
+
+    const ctxTemp = document.getElementById('grafTemp').getContext('2d');
+    const ctxHum = document.getElementById('grafHum').getContext('2d');
+
+    const grafTemp = new Chart(ctxTemp, {
+      type: 'line',
+      data: {
+        labels: etiquetas,
+        datasets: [{
+          label: 'Temperatura (°C)',
+          data: datosTemp,
+          borderColor: '#00ffff',
+          backgroundColor: 'rgba(0,255,255,0.2)',
+          tension: 0.4
+        }]
+      },
+      options: {
+        scales: {
+          y: { beginAtZero: false }
+        }
+      }
+    });
+
+    const grafHum = new Chart(ctxHum, {
+      type: 'line',
+      data: {
+        labels: etiquetas,
+        datasets: [{
+          label: 'Humedad (%)',
+          data: datosHum,
+          borderColor: '#ff00ff',
+          backgroundColor: 'rgba(255,0,255,0.2)',
+          tension: 0.4
+        }]
+      },
+      options: {
+        scales: {
+          y: { beginAtZero: false }
+        }
+      }
+    });
+
+    function generarDatos() {
+      let temperatura = Math.floor(Math.random() * 15) + 20;
+      let humedad = Math.floor(Math.random() * 50) + 40;
+
+      document.getElementById("temp").innerText = temperatura + " °C";
+      document.getElementById("hum").innerText = humedad + " %";
+
+      let estado = document.getElementById("estadoBtn");
+
+      if (temperatura < 30) {
+        estado.className = "boton verde";
+        estado.innerText = "NORMAL";
+      } else {
+        estado.className = "boton rojo";
+        estado.innerText = "ALERTA";
+      }
+
+      // Guardar datos
+      etiquetas.push(contador++);
+      datosTemp.push(temperatura);
+      datosHum.push(humedad);
+
+      if (etiquetas.length > 10) {
+        etiquetas.shift();
+        datosTemp.shift();
+        datosHum.shift();
+      }
+
+      grafTemp.update();
+      grafHum.update();
+    }
+
+    setInterval(generarDatos, 2000);
+  </script>
+
+</body>
+</html>
